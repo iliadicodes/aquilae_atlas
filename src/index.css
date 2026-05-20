@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Crimson Pro", serif;
+  --font-display: "Cinzel", serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-rome-charcoal: #0A0A0A;
+  --color-rome-nav: #0F0F0E;
+  --color-rome-red: #8B0000;
+  --color-rome-bronze: #CD7F32;
+  --color-rome-stone: #121210;
+  --color-rome-border: #2A2A25;
+  --color-rome-text: #E2E2D5;
+  --color-rome-muted: #8A8A7A;
+  --color-rome-dark: #5A5A50;
+}
+
+@layer base {
+  body {
+    @apply bg-rome-charcoal text-rome-text font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-display tracking-widest uppercase;
+  }
+}
+
+.engraved-border {
+  border: 1px solid var(--color-rome-border);
+  position: relative;
+}
+
+.marble-bg {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(205, 127, 50, 0.03) 0%, transparent 100%),
+    linear-gradient(rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0.98));
+}
+
+.map-marker-ring {
+  box-shadow: 0 0 0 4px rgba(205, 127, 50, 0.2);
+}
+
+.map-marker-ring-red {
+  box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.3);
+}
+
+/* Custom Mapbox Controls */
+.mapboxgl-ctrl-group {
+  background: #121210 !important;
+  border: 1px solid #2a2a25 !important;
+  border-radius: 2px !important;
+  overflow: hidden;
+}
+
+.mapboxgl-ctrl-group button {
+  background: transparent !important;
+  border-bottom: 1px solid #2a2a25 !important;
+}
+
+.mapboxgl-ctrl-group button:last-child {
+  border-bottom: none !important;
+}
+
+.mapboxgl-ctrl-group button span {
+  filter: invert(1) brightness(0.8) sepia(1) saturate(5) hue-rotate(-10deg) !important;
+}
+
+.mapboxgl-ctrl-group button:hover {
+  background: #1a1a18 !important;
+}
+
+.mapboxgl-ctrl-zoom-in span {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E") !important;
+}
+
+.mapboxgl-ctrl-zoom-out span {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E") !important;
+}

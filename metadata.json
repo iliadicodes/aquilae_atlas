@@ -1,0 +1,6 @@
+{
+  "name": "AQUILAE ATLAS",
+  "description": "A Roman Legion Atlas. Trace Rome’s legions across war, province, and empire.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
