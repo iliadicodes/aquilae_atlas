@@ -2,41 +2,48 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Layers, Clock, MapPin, Maximize2, Shield, ChevronDown, ChevronUp } from 'lucide-react';
 import Map, { Marker, Source, Layer, MapRef, NavigationControl } from 'react-map-gl/mapbox';
-import { LEGIONS, LEGIO_X_MOVEMENT } from '@/data';
+import { fetchLegions, fetchMovementStages } from '@/lib/api';
 import { CertaintyBadge } from '@/components/ui';
 import { FollowLegionPanel, POIDetails } from '@/components/map';
-import { POI } from '@/types';
+import { Legion, MovementStage, POI } from '@/types';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '';
 
 export const MapExplorer: React.FC = () => {
   const [activeYear, setActiveYear] = useState(117);
-  const [selectedLegion, setSelectedLegion] = useState<string | null>(null);
+  const [selectedLegionId, setSelectedLegionId] = useState<string | null>(null);
   const [_isDossierOpen, setIsDossierOpen] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
   const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
-  // Mobile: sidebar drawer open/closed
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // Mobile: timeline collapsed
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
+  const [legions, setLegions] = useState<Legion[]>([]);
+  const [movementStages, setMovementStages] = useState<MovementStage[]>([]);
   const mapRef = useRef<MapRef>(null);
 
-  const currentLegion = LEGIONS.find((l) => l.id === selectedLegion);
+  useEffect(() => {
+    fetchLegions().then(setLegions);
+  }, []);
+
+  const currentLegion = legions.find((l) => l.id === selectedLegionId);
 
   const handleFollow = () => {
-    if (selectedLegion === 'leg-x-fretensis') {
+    if (!selectedLegionId) return;
+    fetchMovementStages(selectedLegionId).then((stages) => {
+      if (!stages.length) return;
+      setMovementStages(stages);
       setIsFollowing(true);
       setCurrentStageIndex(0);
       setIsDossierOpen(false);
-      setSelectedLegion(null);
+      setSelectedLegionId(null);
       setIsSidebarOpen(false);
-    }
+    });
   };
 
   useEffect(() => {
-    if (isFollowing) {
-      const yearStr = LEGIO_X_MOVEMENT[currentStageIndex].year;
+    if (isFollowing && movementStages.length) {
+      const yearStr = movementStages[currentStageIndex].year;
       const yearMatch = yearStr.match(/(\d+)/);
       if (yearMatch) {
         let yearNum = parseInt(yearMatch[1]);
@@ -44,22 +51,20 @@ export const MapExplorer: React.FC = () => {
         setActiveYear(yearNum);
       }
     }
-  }, [currentStageIndex, isFollowing]);
+  }, [currentStageIndex, isFollowing, movementStages]);
 
   const mapPadding = useMemo(() => {
-    if (isFollowing) {
-      return { top: 60, bottom: 200, left: 20, right: 20 };
-    }
+    if (isFollowing) return { top: 60, bottom: 200, left: 20, right: 20 };
     return { top: 0, bottom: 0, left: 0, right: 0 };
   }, [isFollowing]);
 
   const currentCoords = useMemo(() => {
-    if (isFollowing) {
-      const stage = LEGIO_X_MOVEMENT[currentStageIndex];
+    if (isFollowing && movementStages.length) {
+      const stage = movementStages[currentStageIndex];
       return { latitude: stage.coords.lat, longitude: stage.coords.lng };
     }
     return { latitude: 41.9028, longitude: 12.4964 };
-  }, [isFollowing, currentStageIndex]);
+  }, [isFollowing, currentStageIndex, movementStages]);
 
   useEffect(() => {
     if (isFollowing && mapRef.current) {
@@ -82,8 +87,8 @@ export const MapExplorer: React.FC = () => {
       type: 'Feature',
       geometry: {
         type: 'LineString',
-        coordinates: LEGIO_X_MOVEMENT
-          .filter((_, i) => i === 0 || LEGIO_X_MOVEMENT[i].transport === 'Sea')
+        coordinates: movementStages
+          .filter((_, i) => i === 0 || movementStages[i].transport === 'Sea')
           .map((s) => [s.coords.lng, s.coords.lat]),
       },
     },
@@ -91,12 +96,12 @@ export const MapExplorer: React.FC = () => {
       type: 'Feature',
       geometry: {
         type: 'LineString',
-        coordinates: LEGIO_X_MOVEMENT
-          .filter((_, i) => i === 0 || LEGIO_X_MOVEMENT[i].transport === 'Land')
+        coordinates: movementStages
+          .filter((_, i) => i === 0 || movementStages[i].transport === 'Land')
           .map((s) => [s.coords.lng, s.coords.lat]),
       },
     },
-  }), []);
+  }), [movementStages]);
 
   const eraLabels = [
     { label: 'Republic', min: -Infinity, max: -27 },
@@ -146,11 +151,11 @@ export const MapExplorer: React.FC = () => {
       {/* ── Mobile top bar ── */}
       <div className="flex md:hidden items-center justify-between px-4 py-2 bg-rome-nav border-b border-rome-border z-30 shrink-0">
         <button
-          onClick={() => { setIsSidebarOpen(!isSidebarOpen); setSelectedLegion(null); }}
+          onClick={() => { setIsSidebarOpen(!isSidebarOpen); setSelectedLegionId(null); }}
           className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-rome-bronze min-h-[44px] px-2"
         >
           <Shield className="w-4 h-4" />
-          {selectedLegion ? currentLegion?.name : 'Legion Registry'}
+          {selectedLegionId ? currentLegion?.name : 'Legion Registry'}
         </button>
         <button
           onClick={() => setIsTimelineOpen(!isTimelineOpen)}
@@ -237,22 +242,22 @@ export const MapExplorer: React.FC = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {LEGIONS.map((legion) => (
+            {legions.map((legion) => (
               <button
                 key={legion.id}
-                onClick={() => { setSelectedLegion(legion.id); setIsDossierOpen(false); setIsSidebarOpen(false); }}
+                onClick={() => { setSelectedLegionId(legion.id); setIsDossierOpen(false); setIsSidebarOpen(false); }}
                 className={`w-full text-left px-5 py-4 transition-all border-b border-rome-border/30 last:border-0 min-h-[56px] ${
-                  selectedLegion === legion.id ? 'bg-rome-bronze/5' : 'hover:bg-white/5'
+                  selectedLegionId === legion.id ? 'bg-rome-bronze/5' : 'hover:bg-white/5'
                 }`}
               >
                 <div className="flex justify-between items-center">
                   <span className={`text-[13px] font-serif uppercase tracking-widest ${
-                    selectedLegion === legion.id ? 'text-rome-bronze font-bold' : 'text-rome-text opacity-70'
+                    selectedLegionId === legion.id ? 'text-rome-bronze font-bold' : 'text-rome-text opacity-70'
                   }`}>
                     Legio {legion.number}{' '}
                     <span className="opacity-50 text-[10px] ml-1">{legion.cognomen}</span>
                   </span>
-                  {selectedLegion === legion.id && (
+                  {selectedLegionId === legion.id && (
                     <motion.div layoutId="active-indicator" className="w-1.5 h-1.5 bg-rome-bronze rounded-full ring-4 ring-rome-bronze/10 shrink-0" />
                   )}
                 </div>
@@ -288,7 +293,7 @@ export const MapExplorer: React.FC = () => {
             </Marker>
 
             {/* Campaign path */}
-            {isFollowing && (
+            {isFollowing && movementStages.length > 0 && (
               <>
                 <Source id="legion-path-land" type="geojson" data={pathData.landLine as any}>
                   <Layer id="land-line-layer" type="line" paint={{ 'line-color': '#CD7F32', 'line-width': 1.5, 'line-opacity': 0.4 }} />
@@ -299,20 +304,20 @@ export const MapExplorer: React.FC = () => {
               </>
             )}
 
-            {isFollowing && (
-              <Marker longitude={LEGIO_X_MOVEMENT[currentStageIndex].coords.lng} latitude={LEGIO_X_MOVEMENT[currentStageIndex].coords.lat}>
+            {isFollowing && movementStages.length > 0 && (
+              <Marker longitude={movementStages[currentStageIndex].coords.lng} latitude={movementStages[currentStageIndex].coords.lat}>
                 <div className="relative z-10">
                   <div className="w-5 h-5 md:w-6 md:h-6 bg-rome-red rounded-full ring-8 ring-rome-red/30 animate-pulse relative">
                     <div className="absolute inset-0 bg-white rounded-full animate-ping opacity-20" />
                   </div>
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-rome-stone border-l-4 border-l-rome-red px-2 py-1.5 text-[10px] whitespace-nowrap uppercase tracking-widest text-white font-bold shadow-2xl">
-                    {LEGIO_X_MOVEMENT[currentStageIndex].location}
+                    {movementStages[currentStageIndex].location}
                   </div>
                 </div>
               </Marker>
             )}
 
-            {isFollowing && LEGIO_X_MOVEMENT[currentStageIndex].pois?.map((poi) => (
+            {isFollowing && movementStages[currentStageIndex]?.pois?.map((poi) => (
               <Marker key={poi.id} longitude={poi.coords.lng} latitude={poi.coords.lat}>
                 <button
                   className="relative group"
@@ -340,14 +345,14 @@ export const MapExplorer: React.FC = () => {
 
           {/* Follow panel */}
           <AnimatePresence>
-            {isFollowing && (
+            {isFollowing && movementStages.length > 0 && (
               <FollowLegionPanel
-                stages={LEGIO_X_MOVEMENT}
+                stages={movementStages}
                 currentStageIndex={currentStageIndex}
-                onNext={() => setCurrentStageIndex((p) => Math.min(p + 1, LEGIO_X_MOVEMENT.length - 1))}
+                onNext={() => setCurrentStageIndex((p) => Math.min(p + 1, movementStages.length - 1))}
                 onPrev={() => setCurrentStageIndex((p) => Math.max(p - 1, 0))}
-                onClose={() => { setIsFollowing(false); setSelectedPOI(null); }}
-                legionName="Legio X Fretensis"
+                onClose={() => { setIsFollowing(false); setSelectedPOI(null); setMovementStages([]); }}
+                legionName={currentLegion?.name ?? 'Legion'}
                 onSelectPOI={setSelectedPOI}
                 selectedPOIId={selectedPOI?.id}
               />
@@ -420,7 +425,7 @@ export const MapExplorer: React.FC = () => {
 
           {/* Desktop dossier drawer */}
           <AnimatePresence>
-            {selectedLegion && !isFollowing && (
+            {selectedLegionId && !isFollowing && (
               <motion.div
                 initial={{ x: 400, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -428,7 +433,7 @@ export const MapExplorer: React.FC = () => {
                 className="absolute top-4 right-4 bottom-24 w-80 bg-rome-stone border border-rome-bronze/30 shadow-2xl flex flex-col z-50 overflow-hidden rounded-sm hidden md:flex"
               >
                 <button
-                  onClick={() => setSelectedLegion(null)}
+                  onClick={() => setSelectedLegionId(null)}
                   className="absolute top-3 right-3 text-rome-dark hover:text-rome-text transition-colors z-10 p-1"
                 >
                   ✕
@@ -457,14 +462,12 @@ export const MapExplorer: React.FC = () => {
                     </span>
                   </div>
 
-                  {currentLegion!.id === 'leg-x-fretensis' && (
-                    <button
-                      onClick={handleFollow}
-                      className="w-full py-3 bg-rome-red text-white text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-red-800 transition-all border border-rome-bronze/30 flex items-center justify-center gap-2 min-h-[44px]"
-                    >
-                      <MapPin className="w-3 h-3" /> Follow Path
-                    </button>
-                  )}
+                  <button
+                    onClick={handleFollow}
+                    className="w-full py-3 bg-rome-red text-white text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-red-800 transition-all border border-rome-bronze/30 flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <MapPin className="w-3 h-3" /> Follow Path
+                  </button>
 
                   <div className="pt-2 border-t border-rome-border space-y-2">
                     <p className="text-sm text-rome-text font-serif italic leading-relaxed">{currentLegion!.description}</p>
@@ -477,7 +480,7 @@ export const MapExplorer: React.FC = () => {
 
           {/* Mobile dossier bottom sheet */}
           <AnimatePresence>
-            {selectedLegion && !isFollowing && (
+            {selectedLegionId && !isFollowing && (
               <motion.div
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
@@ -494,7 +497,7 @@ export const MapExplorer: React.FC = () => {
                     <h2 className="font-serif text-lg text-rome-text leading-tight">{currentLegion!.name}</h2>
                   </div>
                   <button
-                    onClick={() => setSelectedLegion(null)}
+                    onClick={() => setSelectedLegionId(null)}
                     className="p-2 text-rome-dark hover:text-rome-text min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
@@ -517,14 +520,12 @@ export const MapExplorer: React.FC = () => {
 
                   <p className="text-sm text-rome-text font-serif italic leading-relaxed">{currentLegion!.description}</p>
 
-                  {currentLegion!.id === 'leg-x-fretensis' && (
-                    <button
-                      onClick={handleFollow}
-                      className="w-full py-3 bg-rome-red text-white text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-red-800 transition-all border border-rome-bronze/30 flex items-center justify-center gap-2 min-h-[44px]"
-                    >
-                      <MapPin className="w-3 h-3" /> Follow Path
-                    </button>
-                  )}
+                  <button
+                    onClick={handleFollow}
+                    className="w-full py-3 bg-rome-red text-white text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-red-800 transition-all border border-rome-bronze/30 flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <MapPin className="w-3 h-3" /> Follow Path
+                  </button>
                 </div>
               </motion.div>
             )}
