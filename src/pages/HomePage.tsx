@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Shield } from 'lucide-react';
-import { LEGIONS } from '@/data';
+import { fetchLegions } from '@/lib/api';
+import { Legion } from '@/types';
+
 
 interface HomePageProps {
   onExplore: () => void;
@@ -9,6 +11,12 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onExplore, onBrowse }) => {
+  const [legions, setLegions] = useState<Legion[]>([]);
+
+  useEffect(() => {
+    fetchLegions().then(setLegions);
+  }, []);
+
   return (
     <div className="relative min-h-screen pt-16 flex flex-col items-center justify-center overflow-hidden bg-rome-charcoal">
       {/* Background decor — hidden on mobile for perf */}
@@ -83,7 +91,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onExplore, onBrowse }) => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {LEGIONS.filter((l) => l.status === 'Destroyed' || l.certainty === 'Disputed').map((legion) => (
+          {legions.filter((l) => l.status === 'Destroyed' || l.certainty === 'Disputed').map((legion) => (
             <div
               key={legion.id}
               className="bg-rome-stone border border-rome-border p-6 hover:border-rome-red/50 transition-all group relative overflow-hidden"

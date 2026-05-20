@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Legion } from '@/types';
-import { LEGIONS } from '@/data';
+import { fetchLegions } from '@/lib/api';
 import { LegionCard } from '@/components/ui';
 import { Filter, Swords, Check } from 'lucide-react';
 
@@ -10,9 +10,15 @@ interface DatabasePageProps {
 }
 
 export const DatabasePage: React.FC<DatabasePageProps> = ({ onSelectLegion, onCompare }) => {
+  const [legions, setLegions] = useState<Legion[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchLegions().then((data) => { setLegions(data); setLoading(false); });
+  }, []);
 
   const toggleCompare = (id: string) => {
     setSelectedForCompare((prev) => {
@@ -23,11 +29,10 @@ export const DatabasePage: React.FC<DatabasePageProps> = ({ onSelectLegion, onCo
   };
 
   const handleCompareClick = () => {
-    const selectedLegions = LEGIONS.filter((l) => selectedForCompare.includes(l.id));
-    onCompare(selectedLegions);
+    onCompare(legions.filter((l) => selectedForCompare.includes(l.id)));
   };
 
-  const filteredLegions = LEGIONS.filter((l) => filter === 'All' || l.era.includes(filter));
+  const filteredLegions = legions.filter((l) => filter === 'All' || l.era.includes(filter));
 
   return (
     <div className="pt-20 pb-16 px-4 md:px-6 max-w-7xl mx-auto min-h-screen">
@@ -41,7 +46,6 @@ export const DatabasePage: React.FC<DatabasePageProps> = ({ onSelectLegion, onCo
 
       {/* Controls */}
       <div className="flex flex-col gap-3 mb-8">
-        {/* Era filter — scrollable row on mobile */}
         <div className="flex bg-rome-nav rounded-sm border border-rome-border overflow-x-auto">
           {['All', 'Republic', 'Principate', 'Late Empire'].map((t) => (
             <button
@@ -56,12 +60,8 @@ export const DatabasePage: React.FC<DatabasePageProps> = ({ onSelectLegion, onCo
           ))}
         </div>
 
-        {/* Compare toggle */}
         <button
-          onClick={() => {
-            setIsCompareMode(!isCompareMode);
-            setSelectedForCompare([]);
-          }}
+          onClick={() => { setIsCompareMode(!isCompareMode); setSelectedForCompare([]); }}
           className={`flex items-center justify-center gap-2 px-4 py-3 text-[10px] uppercase tracking-widest font-bold rounded-sm border min-h-[44px] transition-all ${
             isCompareMode
               ? 'bg-rome-red text-white border-rome-red'
@@ -73,7 +73,6 @@ export const DatabasePage: React.FC<DatabasePageProps> = ({ onSelectLegion, onCo
         </button>
       </div>
 
-      {/* Compare banner */}
       {isCompareMode && (
         <div className="mb-8 p-4 bg-rome-stone border border-rome-red/30 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -92,33 +91,40 @@ export const DatabasePage: React.FC<DatabasePageProps> = ({ onSelectLegion, onCo
         </div>
       )}
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredLegions.map((legion) => (
-          <div key={legion.id} className="relative">
-            <LegionCard
-              legion={legion}
-              onClick={() => (isCompareMode ? toggleCompare(legion.id) : onSelectLegion(legion))}
-            />
-            {isCompareMode && (
-              <div
-                onClick={() => toggleCompare(legion.id)}
-                className={`absolute top-4 right-4 w-7 h-7 border-2 transition-all cursor-pointer flex items-center justify-center ${
-                  selectedForCompare.includes(legion.id)
-                    ? 'border-rome-red bg-rome-red text-white'
-                    : 'border-rome-dark bg-rome-charcoal/80'
-                }`}
-              >
-                {selectedForCompare.includes(legion.id) && <Check className="w-4 h-4" />}
-              </div>
-            )}
-          </div>
-        ))}
-        <div className="engraved-border border-dashed border-rome-border flex flex-col items-center justify-center p-10 text-rome-dark bg-rome-nav/30">
-          <Filter className="w-7 h-7 mb-3 opacity-20" />
-          <span className="text-[10px] uppercase tracking-widest font-bold">End of Attested Record</span>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-48 bg-rome-stone border border-rome-border animate-pulse" />
+          ))}
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredLegions.map((legion) => (
+            <div key={legion.id} className="relative">
+              <LegionCard
+                legion={legion}
+                onClick={() => (isCompareMode ? toggleCompare(legion.id) : onSelectLegion(legion))}
+              />
+              {isCompareMode && (
+                <div
+                  onClick={() => toggleCompare(legion.id)}
+                  className={`absolute top-4 right-4 w-7 h-7 border-2 transition-all cursor-pointer flex items-center justify-center ${
+                    selectedForCompare.includes(legion.id)
+                      ? 'border-rome-red bg-rome-red text-white'
+                      : 'border-rome-dark bg-rome-charcoal/80'
+                  }`}
+                >
+                  {selectedForCompare.includes(legion.id) && <Check className="w-4 h-4" />}
+                </div>
+              )}
+            </div>
+          ))}
+          <div className="engraved-border border-dashed border-rome-border flex flex-col items-center justify-center p-10 text-rome-dark bg-rome-nav/30">
+            <Filter className="w-7 h-7 mb-3 opacity-20" />
+            <span className="text-[10px] uppercase tracking-widest font-bold">End of Attested Record</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
