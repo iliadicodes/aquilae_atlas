@@ -2,6 +2,12 @@ export type CertaintyLevel = 'Confirmed' | 'Probable' | 'Possible' | 'Disputed' 
 export type LegionStatus = 'Active' | 'Disbanded' | 'Destroyed' | 'Unknown' | 'Last Attested';
 export type Era = 'Republic' | 'Late Republic' | 'Principate' | 'Crisis' | 'Late Empire';
 
+export interface BookRef {
+  title: string;
+  author: string;
+  url: string;
+}
+
 export interface Legion {
   id: string;
   name: string;
@@ -18,6 +24,7 @@ export interface Legion {
   description: string;
   lastAttestation: string;
   fate: string;
+  bookRef?: BookRef;
 }
 
 export type POIType = 'Battle' | 'Camp' | 'Siege' | 'Fortress' | 'Monument';
@@ -35,6 +42,7 @@ export interface POI {
     terrain: string;
     estimatedStrength?: string;
   };
+  bookRef?: BookRef;
 }
 
 export interface MovementStage {
@@ -46,6 +54,7 @@ export interface MovementStage {
   transport?: 'Sea' | 'Land';
   coords: { x: number; y: number; lat: number; lng: number };
   pois?: POI[];
+  bookRef?: BookRef;
 }
 
 export type PageId = 'home' | 'database' | 'profile' | 'map' | 'campaigns' | 'provinces' | 'timeline' | 'sources';

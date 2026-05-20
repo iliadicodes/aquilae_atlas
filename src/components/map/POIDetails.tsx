@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Truck, Ruler, Mountain, Users, Shield } from 'lucide-react';
+import { X, Truck, Ruler, Mountain, Users, Shield, BookOpen, ExternalLink } from 'lucide-react';
 import { POI } from '@/types';
 
 interface POIDetailsProps {
@@ -72,6 +72,28 @@ export const POIDetails: React.FC<POIDetailsProps> = ({ poi, onClose }) => {
               </div>
             )}
           </div>
+
+          {poi.bookRef && (
+            <div className="px-4 py-3 bg-rome-nav border-t border-rome-bronze/20">
+              <p className="text-[8px] uppercase tracking-widest text-rome-dark font-bold mb-2 flex items-center gap-1.5">
+                <BookOpen className="w-3 h-3" /> Archival Reference
+              </p>
+              <a
+                href={poi.bookRef.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start justify-between gap-2 group"
+              >
+                <div className="min-w-0">
+                  <p className="text-[11px] font-serif italic text-rome-bronze group-hover:text-white transition-colors leading-tight truncate">
+                    {poi.bookRef.title}
+                  </p>
+                  <p className="text-[9px] text-rome-dark mt-0.5">{poi.bookRef.author}</p>
+                </div>
+                <ExternalLink className="w-3 h-3 text-rome-dark group-hover:text-rome-bronze transition-colors shrink-0 mt-0.5" />
+              </a>
+            </div>
+          )}
 
           <div className="px-4 py-2.5 bg-rome-nav border-t border-rome-border">
             <div className="flex justify-between items-center text-[8px] uppercase tracking-widest text-rome-dark font-bold">
