@@ -17,6 +17,11 @@ export const LEGIONS: Legion[] = [
     description: 'One of the most famous legions of the Imperial era, central to the Siege of Jerusalem and the fall of Masada.',
     lastAttestation: 'Early 5th Century (Notitia Dignitatum)',
     fate: 'Last recorded at Aila (modern Aqaba) guarding the Red Sea.',
+    bookRef: {
+      title: 'Legio X Fretensis: A Prosopographical Study',
+      author: 'Edward Dabrowa',
+      url: 'https://www.amazon.com/s?k=Legio+X+Fretensis+Dabrowa',
+    },
   },
   {
     id: 'leg-ix-hispana',
@@ -34,6 +39,11 @@ export const LEGIONS: Legion[] = [
     description: 'The "Lost Legion" of popular fiction. It famously disappeared from the record after serving in Roman Britain.',
     lastAttestation: 'c. 120 AD',
     fate: 'Disappeared. Theories range from destruction in Scotland to relocation and destruction in the East (Bar Kokhba revolt).',
+    bookRef: {
+      title: 'The Eagle of the Ninth',
+      author: 'Rosemary Sutcliff',
+      url: 'https://www.amazon.com/s?k=Eagle+of+the+Ninth+Sutcliff',
+    },
   },
   {
     id: 'leg-xx-valeria',

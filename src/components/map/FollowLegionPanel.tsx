@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, X, MapPin, Calendar, Info } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, MapPin, Calendar, Info, BookOpen, ExternalLink } from 'lucide-react';
 import { MovementStage } from '@/types';
 import { CertaintyBadge } from '@/components/ui';
 
@@ -127,6 +127,25 @@ export const FollowLegionPanel: React.FC<FollowLegionPanelProps> = ({
                     </>
                   )}
                 </div>
+                {currentStage.bookRef && (
+                  <div className="hidden md:block">
+                    <span className="text-[9px] uppercase tracking-widest text-rome-dark font-bold block mb-1 flex items-center gap-1">
+                      <BookOpen className="w-2.5 h-2.5" /> Read More
+                    </span>
+                    <a
+                      href={currentStage.bookRef.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-1 group"
+                    >
+                      <p className="text-[9px] font-serif italic text-rome-bronze group-hover:text-white transition-colors leading-tight line-clamp-2">
+                        {currentStage.bookRef.title}
+                      </p>
+                      <ExternalLink className="w-2.5 h-2.5 text-rome-dark group-hover:text-rome-bronze transition-colors shrink-0 mt-0.5" />
+                    </a>
+                    <p className="text-[8px] text-rome-dark mt-0.5">{currentStage.bookRef.author}</p>
+                  </div>
+                )}
                 <div>
                   <span className="text-[9px] uppercase tracking-widest text-rome-dark font-bold block mb-1">Province</span>
                   <div className="flex items-center gap-1.5 text-rome-text">

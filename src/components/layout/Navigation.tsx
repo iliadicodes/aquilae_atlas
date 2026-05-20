@@ -69,6 +69,16 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, setPage }) 
             ))}
           </div>
 
+          {/* Support CTA */}
+          <a
+            href="https://www.amazon.com/s?k=Roman+Legion+history"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden lg:inline-flex items-center gap-2 px-4 py-2 border border-rome-bronze/40 text-rome-bronze hover:bg-rome-bronze/10 transition-all text-[10px] uppercase font-bold tracking-widest shrink-0"
+          >
+            Support the Archive
+          </a>
+
           {/* Desktop search */}
           <div className="hidden md:block flex-1 max-w-xs">
             <div className="relative">

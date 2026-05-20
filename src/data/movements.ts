@@ -33,6 +33,11 @@ export const LEGIO_X_MOVEMENT: MovementStage[] = [
     certainty: 'Confirmed',
     transport: 'Sea',
     coords: { x: 55, y: 48, lat: 38.9317, lng: 20.7692 },
+    bookRef: {
+      title: 'Actium 31 BC: Downfall of Antony and Cleopatra',
+      author: 'Si Sheppard',
+      url: 'https://www.amazon.com/s?k=Actium+31+BC+Si+Sheppard',
+    },
     pois: [
       {
         id: 'poi-2-1',
@@ -46,6 +51,11 @@ export const LEGIO_X_MOVEMENT: MovementStage[] = [
           distance: '480 km (Sea)',
           terrain: 'Open Sea / Archipelago',
           estimatedStrength: '12,000 Marines/Legionaries',
+        },
+        bookRef: {
+          title: 'Actium 31 BC: Downfall of Antony and Cleopatra',
+          author: 'Si Sheppard',
+          url: 'https://www.amazon.com/s?k=Actium+31+BC+Si+Sheppard',
         },
       },
     ],
@@ -83,6 +93,11 @@ export const LEGIO_X_MOVEMENT: MovementStage[] = [
     certainty: 'Confirmed',
     transport: 'Land',
     coords: { x: 78, y: 52, lat: 31.7683, lng: 35.2137 },
+    bookRef: {
+      title: 'The Jewish War',
+      author: 'Flavius Josephus',
+      url: 'https://www.amazon.com/s?k=The+Jewish+War+Josephus',
+    },
     pois: [
       {
         id: 'poi-4-1',
@@ -96,6 +111,11 @@ export const LEGIO_X_MOVEMENT: MovementStage[] = [
           distance: '65 km (Land)',
           terrain: 'Judaean Hills',
           estimatedStrength: '15,000 (with Auxiliaries)',
+        },
+        bookRef: {
+          title: 'The Jewish War',
+          author: 'Flavius Josephus',
+          url: 'https://www.amazon.com/s?k=The+Jewish+War+Josephus',
         },
       },
       {
@@ -121,6 +141,11 @@ export const LEGIO_X_MOVEMENT: MovementStage[] = [
     certainty: 'Confirmed',
     transport: 'Land',
     coords: { x: 78, y: 55, lat: 31.315, lng: 35.3533 },
+    bookRef: {
+      title: 'Masada: From Jewish Revolt to Modern Myth',
+      author: 'Jodi Magness',
+      url: 'https://www.amazon.com/s?k=Masada+Jodi+Magness',
+    },
     pois: [
       {
         id: 'poi-5-1',
@@ -133,6 +158,11 @@ export const LEGIO_X_MOVEMENT: MovementStage[] = [
           supplyLine: 'Dead Sea Maritime Chain',
           distance: '100 km',
           terrain: 'Desert Basin',
+        },
+        bookRef: {
+          title: 'Masada: From Jewish Revolt to Modern Myth',
+          author: 'Jodi Magness',
+          url: 'https://www.amazon.com/s?k=Masada+Jodi+Magness',
         },
       },
       {

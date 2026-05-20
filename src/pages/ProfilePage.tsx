@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, MapPin, Calendar, Target, History, Award, AlertTriangle, Navigation, FileSearch, Swords, ArrowLeft } from 'lucide-react';
+import { Shield, MapPin, Calendar, Target, History, Award, AlertTriangle, Navigation, FileSearch, Swords, ArrowLeft, BookOpen, ExternalLink, Building2 } from 'lucide-react';
 import { Legion } from '@/types';
 import { CertaintyBadge, LegionEmblem } from '@/components/ui';
 
@@ -141,6 +141,38 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ legion, onBack }) => {
               <p className="text-xs text-rome-muted font-serif italic leading-relaxed">{legion.symbolDescription}</p>
             </div>
           </section>
+
+          {legion.bookRef && (
+            <section>
+              <h3 className="text-[12px] uppercase tracking-[0.3em] font-bold text-rome-bronze mb-5 flex items-center gap-2">
+                <BookOpen className="w-3.5 h-3.5" /> Historical Reference
+              </h3>
+              <div className="bg-rome-nav border border-rome-bronze/30 p-5 md:p-6 space-y-4">
+                <a
+                  href={legion.bookRef.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block"
+                >
+                  <p className="text-base font-serif italic text-rome-bronze group-hover:text-white transition-colors leading-snug mb-1">
+                    {legion.bookRef.title}
+                  </p>
+                  <p className="text-xs text-rome-muted mb-3">{legion.bookRef.author}</p>
+                  <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-rome-red hover:bg-red-800 transition-colors text-white text-[10px] uppercase font-bold tracking-widest border border-rome-bronze/40">
+                    <ExternalLink className="w-3 h-3" /> Acquire the Text
+                  </span>
+                </a>
+                <div className="pt-3 border-t border-rome-border">
+                  <a
+                    href="mailto:licensing@aquilae-atlas.com"
+                    className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-rome-dark hover:text-rome-bronze transition-colors font-bold"
+                  >
+                    <Building2 className="w-3.5 h-3.5" /> Institutional Licensing
+                  </a>
+                </div>
+              </div>
+            </section>
+          )}
 
           <section>
             <div className="relative group cursor-pointer overflow-hidden border border-rome-border">
