@@ -20,6 +20,8 @@ export const MapExplorer: React.FC = () => {
   const [isTimelineOpen, setIsTimelineOpen] = useState(false);
   const [legions, setLegions] = useState<Legion[]>([]);
   const [movementStages, setMovementStages] = useState<MovementStage[]>([]);
+  const [followingLegionName, setFollowingLegionName] = useState('');
+  const [noStagesLegion, setNoStagesLegion] = useState<string | null>(null);
   const mapRef = useRef<MapRef>(null);
 
   useEffect(() => {
@@ -29,9 +31,15 @@ export const MapExplorer: React.FC = () => {
   const currentLegion = legions.find((l) => l.id === selectedLegionId);
 
   const handleFollow = () => {
-    if (!selectedLegionId) return;
+    if (!selectedLegionId || !currentLegion) return;
+    const legionName = currentLegion.name;
     fetchMovementStages(selectedLegionId).then((stages) => {
-      if (!stages.length) return;
+      if (!stages.length) {
+        setNoStagesLegion(legionName);
+        return;
+      }
+      setNoStagesLegion(null);
+      setFollowingLegionName(legionName);
       setMovementStages(stages);
       setIsFollowing(true);
       setCurrentStageIndex(0);
@@ -352,7 +360,7 @@ export const MapExplorer: React.FC = () => {
                 onNext={() => setCurrentStageIndex((p) => Math.min(p + 1, movementStages.length - 1))}
                 onPrev={() => setCurrentStageIndex((p) => Math.max(p - 1, 0))}
                 onClose={() => { setIsFollowing(false); setSelectedPOI(null); setMovementStages([]); }}
-                legionName={currentLegion?.name ?? 'Legion'}
+                legionName={followingLegionName}
                 onSelectPOI={setSelectedPOI}
                 selectedPOIId={selectedPOI?.id}
               />
@@ -469,6 +477,12 @@ export const MapExplorer: React.FC = () => {
                     <MapPin className="w-3 h-3" /> Follow Path
                   </button>
 
+                  {noStagesLegion === currentLegion!.name && (
+                    <p className="text-[10px] text-rome-red font-serif italic text-center">
+                      No campaign data recorded for this legion.
+                    </p>
+                  )}
+
                   <div className="pt-2 border-t border-rome-border space-y-2">
                     <p className="text-sm text-rome-text font-serif italic leading-relaxed">{currentLegion!.description}</p>
                     <p className="text-[11px] text-rome-muted italic">{currentLegion!.fate}</p>
@@ -526,6 +540,12 @@ export const MapExplorer: React.FC = () => {
                   >
                     <MapPin className="w-3 h-3" /> Follow Path
                   </button>
+
+                  {noStagesLegion === currentLegion!.name && (
+                    <p className="text-[10px] text-rome-red font-serif italic text-center">
+                      No campaign data recorded for this legion.
+                    </p>
+                  )}
                 </div>
               </motion.div>
             )}

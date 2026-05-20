@@ -25,6 +25,12 @@ export interface Legion {
   lastAttestation: string;
   fate: string;
   bookRef?: BookRef;
+  activePeriod?: string;
+  garrisonHq?: string[];
+  nicknames?: string;
+  mascots?: string[];
+  engagements?: string[];
+  notableCommanders?: string[];
 }
 
 export type POIType = 'Battle' | 'Camp' | 'Siege' | 'Fortress' | 'Monument';

@@ -105,6 +105,41 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ legion, onBack }) => {
             </div>
           </section>
 
+          {legion.engagements && legion.engagements.length > 0 && (
+            <section>
+              <h3 className="text-[12px] uppercase tracking-[0.3em] font-bold text-rome-bronze mb-5 flex items-center gap-3">
+                <span className="w-6 h-[1px] bg-rome-bronze" />
+                Engagements
+              </h3>
+              <div className="bg-[#1A1A18] border border-rome-border p-5 md:p-8 rounded-sm space-y-2">
+                {legion.engagements.map((e) => (
+                  <div key={e} className="flex items-center gap-3">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rome-red shrink-0" />
+                    <span className="text-sm font-serif text-rome-text">{e}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {legion.notableCommanders && legion.notableCommanders.length > 0 && (
+            <section>
+              <h3 className="text-[12px] uppercase tracking-[0.3em] font-bold text-rome-bronze mb-5 flex items-center gap-3">
+                <span className="w-6 h-[1px] bg-rome-bronze" />
+                Notable Commanders
+              </h3>
+              <div className="bg-[#1A1A18] border border-rome-border p-5 md:p-8 rounded-sm">
+                <div className="flex flex-wrap gap-2">
+                  {legion.notableCommanders.map((c) => (
+                    <span key={c} className="px-3 py-1 border border-rome-border text-[11px] uppercase tracking-widest text-rome-bronze font-bold bg-rome-stone/50">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
           <section>
             <h3 className="text-[12px] uppercase tracking-[0.3em] font-bold text-rome-bronze mb-5 flex items-center gap-3">
               <span className="w-6 h-[1px] bg-rome-bronze" />
@@ -141,6 +176,39 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ legion, onBack }) => {
               <p className="text-xs text-rome-muted font-serif italic leading-relaxed">{legion.symbolDescription}</p>
             </div>
           </section>
+
+          {(legion.activePeriod || legion.nicknames || (legion.garrisonHq && legion.garrisonHq.length > 0)) && (
+            <section>
+              <h3 className="text-[12px] uppercase tracking-[0.3em] font-bold text-rome-bronze mb-5">Service Record</h3>
+              <div className="bg-rome-nav border border-rome-border p-5 space-y-4">
+                {legion.activePeriod && (
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest text-rome-dark font-bold block mb-1">Active Period</span>
+                    <span className="text-sm font-serif text-rome-text">{legion.activePeriod}</span>
+                  </div>
+                )}
+                {legion.nicknames && (
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest text-rome-dark font-bold block mb-1">Nicknames</span>
+                    <span className="text-sm font-serif italic text-rome-bronze">{legion.nicknames}</span>
+                  </div>
+                )}
+                {legion.garrisonHq && legion.garrisonHq.length > 0 && (
+                  <div>
+                    <span className="text-[9px] uppercase tracking-widest text-rome-dark font-bold block mb-2">Garrison / HQ</span>
+                    <div className="space-y-1">
+                      {legion.garrisonHq.map((g) => (
+                        <div key={g} className="flex items-start gap-2">
+                          <span className="w-1 h-1 rounded-full bg-rome-bronze shrink-0 mt-1.5" />
+                          <span className="text-xs font-serif text-rome-muted">{g}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {legion.bookRef && (
             <section>

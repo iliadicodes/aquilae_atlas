@@ -26,6 +26,12 @@ export async function fetchLegions(): Promise<Legion[]> {
     lastAttestation: r.last_attestation,
     fate: r.fate,
     bookRef: toBookRef(r),
+    activePeriod: r.active_period ?? undefined,
+    garrisonHq: r.garrison_hq ?? undefined,
+    nicknames: r.nicknames ?? undefined,
+    mascots: r.mascots ?? undefined,
+    engagements: r.engagements ?? undefined,
+    notableCommanders: r.notable_commanders ?? undefined,
   }));
 }
 
